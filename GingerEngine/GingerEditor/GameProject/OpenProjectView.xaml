@@ -22,7 +22,7 @@
             <Button Content="Open"
                     Width="96"
                     IsDefault="True" />
-            <Button Content="Cancel"
+            <Button Content="Exit"
                     Width="96"
                     Margin="30,0,0,0"
                     IsCancel="True" />
