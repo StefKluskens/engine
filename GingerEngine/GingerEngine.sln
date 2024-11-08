@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34607.119
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GingerEditor", "GingerEditor\GingerEditor.csproj", "{840EDF83-ABCA-46F9-940E-01114C67B9BB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{84AB3478-5A95-441C-BE2E-5A47B4AF1BF3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84AB3478-5A95-441C-BE2E-5A47B4AF1BF3}.Debug|x64.ActiveCfg = Debug|x64
+		{84AB3478-5A95-441C-BE2E-5A47B4AF1BF3}.Debug|x64.Build.0 = Debug|x64
+		{84AB3478-5A95-441C-BE2E-5A47B4AF1BF3}.Release|x64.ActiveCfg = Release|x64
+		{84AB3478-5A95-441C-BE2E-5A47B4AF1BF3}.Release|x64.Build.0 = Release|x64
+		{840EDF83-ABCA-46F9-940E-01114C67B9BB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{840EDF83-ABCA-46F9-940E-01114C67B9BB}.Debug|x64.Build.0 = Debug|Any CPU
+		{840EDF83-ABCA-46F9-940E-01114C67B9BB}.Release|x64.ActiveCfg = Release|Any CPU
+		{840EDF83-ABCA-46F9-940E-01114C67B9BB}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A733FD01-BAE3-4E91-9AA1-F0CEC78E2E80}
+	EndGlobalSection
+EndGlobal
