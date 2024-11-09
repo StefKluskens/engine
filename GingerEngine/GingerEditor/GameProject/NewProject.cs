@@ -1,14 +1,8 @@
 ﻿using GingerEditor.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GingerEditor.GameProject
 {
@@ -41,29 +35,27 @@ namespace GingerEditor.GameProject
             get { return _projectName; }
             set
             {
-                if (_projectName == value)
+                if (_projectName != value)
                 {
-                    return;
+                    _projectName = value;
+                    ValidateProjectPath();
+                    OnPropertyChanged(nameof(ProjectName));
                 }
-
-                _projectName = value;
-                OnPropertyChanged(nameof(ProjectName));
             }
         }
 
-        private string _projectPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\GingerProject\";
+        private string _projectPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\GingerProjects\";
         public string ProjectPath
         {
             get { return _projectPath; }
             set
             {
-                if (_projectPath == value)
+                if (_projectPath != value)
                 {
-                    return;
+                    _projectPath = value;
+                    ValidateProjectPath();
+                    OnPropertyChanged(nameof(ProjectPath));
                 }
-
-                _projectPath = value;
-                OnPropertyChanged(nameof(ProjectPath));
             }
         }
 
@@ -71,6 +63,34 @@ namespace GingerEditor.GameProject
         public ReadOnlyObservableCollection<ProjectTemplate> ProjectTemplates
         {
             get;
+        }
+
+        private bool _isValid;
+        public bool IsValid 
+        {
+            get => _isValid; 
+            set
+            {
+                if (_isValid != value)
+                {
+                    _isValid = value;
+                    OnPropertyChanged(nameof(IsValid));
+                }
+            }
+        }
+
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                if (_errorMessage != value)
+                {
+                    _errorMessage = value;
+                    OnPropertyChanged(nameof(ErrorMessage));
+                }
+            }
         }
 
         public NewProject()
@@ -96,11 +116,105 @@ namespace GingerEditor.GameProject
 
                     _projectTemplates.Add(template);
                 }
+
+                ValidateProjectPath();
             } 
             catch (Exception ex) 
             { 
                 Debug.WriteLine(ex.Message);
                 //TODO log error
+            }
+        }
+
+        private bool ValidateProjectPath()
+        {
+            var path = ProjectPath;
+            if (!Path.EndsInDirectorySeparator(path))
+            {
+                path += @"\";
+            }
+
+            path += $@"{ProjectName}\";
+
+            IsValid = false;
+
+            if (string.IsNullOrWhiteSpace(ProjectName.Trim()))
+            {
+                ErrorMessage = "Project name cannot be empty";
+            }
+            else if (ProjectName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+            {
+                ErrorMessage = "Project name contains invalid character(s)";
+            }
+            else if (string.IsNullOrWhiteSpace(ProjectPath.Trim()))
+            {
+                ErrorMessage = "Project path invalid";
+            }
+            else if (ProjectPath.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                ErrorMessage = "Project path contains invalid character(s)";
+            }
+            else if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any())
+            {
+                ErrorMessage = "Project path already exists and is not empty";
+            }
+            else
+            {
+                ErrorMessage = string.Empty;
+                IsValid = true;
+            }
+
+            return IsValid;
+        }
+
+        //Return project path if project is created successfully
+        public string CreateProject(ProjectTemplate template)
+        {
+            ValidateProjectPath();
+
+            if (!IsValid)
+            {
+                return string.Empty;
+            }
+
+            if (!Path.EndsInDirectorySeparator(ProjectPath))
+            {
+                ProjectPath += @"\";
+            }
+            var fullPath = $@"{ProjectPath}{ProjectName}\";
+
+            try
+            {
+                if (!Directory.Exists(fullPath))
+                {
+                    Directory.CreateDirectory(fullPath);
+                }
+
+                foreach (var folder in template.Folders)
+                {
+                    Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(fullPath), folder)));
+                }
+
+                //Makes folder hidden
+                var dirInfo = new DirectoryInfo(fullPath + @".ginger\");
+                dirInfo.Attributes |= FileAttributes.Hidden;
+
+                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.jpg")));
+                File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.jpg")));
+
+                var projectXML = File.ReadAllText(template.ProjectFilePath);
+                projectXML = string.Format(projectXML, ProjectName, ProjectPath);
+
+                var projectPath = Path.GetFullPath(Path.Combine(fullPath, $"{ProjectName}{Project.Extension}"));
+                File.WriteAllText(projectPath, projectXML);
+
+                return fullPath;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                //TODO log error
+                return string.Empty;
             }
         }
     }
