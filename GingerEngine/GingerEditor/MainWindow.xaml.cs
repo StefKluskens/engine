@@ -1,14 +1,6 @@
 ﻿using GingerEditor.GameProject;
-using System.Text;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace GingerEditor
 {
@@ -22,6 +14,8 @@ namespace GingerEditor
             InitializeComponent();
 
             Loaded += OnMainWindowLoaded;
+
+            Closing += OnWindowClosing;
         }
 
         private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
@@ -31,16 +25,24 @@ namespace GingerEditor
             OpenProjectBrowser();
         }
 
+        private void OnWindowClosing(object? sender, CancelEventArgs e)
+        {
+            Closing -= OnWindowClosing;
+            Project.Current?.UnloadProject();
+        }
+
         private void OpenProjectBrowser()
         {
             var projectBrowser = new ProjectBrowserDialog();
-            if (projectBrowser.ShowDialog() == false)
+            if (projectBrowser.ShowDialog() == false || projectBrowser.DataContext == null)
             {
                 Application.Current.Shutdown();
             }
             else
             {
+                Project.Current?.UnloadProject();
 
+                DataContext = projectBrowser.DataContext;
             }
         }
     }
