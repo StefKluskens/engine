@@ -11,6 +11,12 @@ namespace GingerEditor.GameProject
         public OpenProjectView()
         {
             InitializeComponent();
+
+            Loaded += (s, e) =>
+            {
+                var item = projectListBox.ItemContainerGenerator.ContainerFromIndex(projectListBox.SelectedIndex) as ListBoxItem;
+                item?.Focus();
+            };
         }
 
         private void OnOpenButton_Click(object sender, RoutedEventArgs e)
